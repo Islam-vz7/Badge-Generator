@@ -32,18 +32,12 @@ for font_file in font_files:
 
 
 # Function to create the PDF
-def create_pdf(names, word, font, logo_path1, logo_path2):
+def create_pdf(names, word_var, font, logo_path1, logo_path2):
     # Ask the user to choose the file path and name for saving the PDF
     file_path = filedialog.asksaveasfilename(defaultextension=".pdf", filetypes=[("PDF files", "*.pdf")])
     
     if not file_path:
-        return  # User canceled the operation
-    
-    # filename = "Badges-1.pdf"
-    # counter = 1
-    # while os.path.exists(filename):
-    #     counter += 1
-    #     filename = f"Badges-{counter}.pdf"
+        return
 
     c = canvas.Canvas(file_path, pagesize=A4)
     width, height = A4
@@ -71,7 +65,7 @@ def create_pdf(names, word, font, logo_path1, logo_path2):
 
         # Add the user-specified word to the middle-bottom of the cell
         c.setFont("Helvetica", 14)  # Not bold
-        c.drawCentredString(x + cell_width / 2, y + cell_height / 4, word)
+        c.drawCentredString(x + cell_width / 2, y + cell_height / 4, word_var)
 
         # Draw a border around the cell
         c.rect(x, y, cell_width, cell_height)
@@ -84,6 +78,15 @@ def browse_files(entry):
     entry.delete(0, tk.END)
     entry.insert(0, filename)
 
+# Function to switch between Entry and OptionMenu
+def switch_word_entry(value):
+    if value == "Other":
+        word_entry.config(state="normal")
+        word_optionmenu.config(state="disabled")
+    else:
+        word_entry.config(state="disabled")
+        word_optionmenu.config(state="normal")
+
 # Create the GUI
 root = tk.Tk()
 root.title("Badges Generator")
@@ -93,12 +96,18 @@ names_label.pack()
 names_entry = tk.Entry(root, width=50)
 names_entry.pack()
 
+options = ["Candidate", "Faculty", "Volunteer"]
 word_label = tk.Label(root, text="Select the status:")
 word_label.pack()
 word_var = tk.StringVar(root)
-word_var.set("Candidate")  # default value
-word_optionmenu = tk.OptionMenu(root, word_var, "Candidate", "Faculty", "Volunteer")
+word_var.set(options[0])  # default value
+word_var.trace("w", lambda *args: switch_word_entry(word_var.get()))  # call switch_word_entry when the variable changes
+
+word_optionmenu = tk.OptionMenu(root, word_var, *options, "Other")
 word_optionmenu.pack()
+
+word_entry = tk.Entry(root, width=20, state="disabled")
+word_entry.pack()
 
 font_label = tk.Label(root, text="Select a font for the names:")
 font_label.pack()
