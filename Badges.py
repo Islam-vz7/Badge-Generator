@@ -62,6 +62,7 @@ def create_pdf(names, word_var, font, logo_path1, logo_path2, custom_word=None):
                 for logo_path, offset in zip([logo_path1, logo_path2], [0, cell_width - 2*cm]):  # Different logos
                     if logo_path:
                         logo = Image.open(logo_path)
+                        logo = logo.convert("RGB")
                         logo_width, logo_height = logo.size
                         aspect = logo_height / float(logo_width)
                         logo_width = 2*cm  # Bigger logos
@@ -148,7 +149,7 @@ logo2_entry.pack()
 logo2_button = tk.Button(root, text="Browse", command=lambda: browse_files(logo2_entry))
 logo2_button.pack()
 
-submit_button = tk.Button(root, text="Create Badges", command=lambda: create_pdf(names_entry.get().split(' '), word_var.get(), font_var.get(), logo1_entry.get(), logo2_entry.get(), word_entry.get() if word_var.get() == "Other" else None))
+submit_button = tk.Button(root, text="Create Badges", command=lambda: create_pdf(names_entry.get().split(','), word_var.get(), font_var.get(), logo1_entry.get(), logo2_entry.get(), word_entry.get() if word_var.get() == "Other" else None))
 
 submit_button.pack()
 
