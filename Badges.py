@@ -32,7 +32,7 @@ for font_file in font_files:
 
 
 # Function to create the PDF
-def create_pdf(names, word_var, font, logo_path1, logo_path2):
+def create_pdf(names, word_var, font, logo_path1, logo_path2, custom_word=None):
     # Ask the user to choose the file path and name for saving the PDF
     file_path = filedialog.asksaveasfilename(defaultextension=".pdf", filetypes=[("PDF files", "*.pdf")])
     
@@ -44,31 +44,47 @@ def create_pdf(names, word_var, font, logo_path1, logo_path2):
     cell_width = width / 3
     cell_height = height / 6  # Smaller, rectangular cells
 
-    # Add the names to the cells
-    for i, name in enumerate(names):
-        x = (i % 3) * cell_width
-        y = height - ((i // 3 + 1) * cell_height)
+    num_names = len(names)
+    max_names_per_page = 12
+    num_pages = (num_names - 1) // max_names_per_page + 1 # Calculate number of pages needed
 
-        # Add the logos to the top corners of the cell
-        for logo_path, offset in zip([logo_path1, logo_path2], [0, cell_width - 2*cm]):  # Different logos
-            if logo_path:
-                logo = Image.open(logo_path)
-                logo_width, logo_height = logo.size
-                aspect = logo_height / float(logo_width)
-                logo_width = 2*cm  # Bigger logos
-                logo_height = logo_width * aspect
-                c.drawImage(logo_path, x + offset, y + cell_height - logo_height, width=logo_width, height=logo_height)
+    for page_num in range(num_pages):
 
-        # Add the name to the middle of the cell
-        c.setFont(f"{font}", 20)  # Bigger, bold font
-        c.drawCentredString(x + cell_width / 2, y + cell_height / 2, name)
+        # Add the names to the cells
+        for i in range(max_names_per_page):
+            name_idx = page_num * max_names_per_page + i
+            if name_idx < num_names:
+                name = names[name_idx]
+                x = (i % 3) * cell_width
+                y = height - ((i // 3 % 4 + 1) * cell_height)
 
-        # Add the user-specified word to the middle-bottom of the cell
-        c.setFont("Helvetica", 14)  # Not bold
-        c.drawCentredString(x + cell_width / 2, y + cell_height / 4, word_var)
+                # Add the logos to the top corners of the cell
+                for logo_path, offset in zip([logo_path1, logo_path2], [0, cell_width - 2*cm]):  # Different logos
+                    if logo_path:
+                        logo = Image.open(logo_path)
+                        logo_width, logo_height = logo.size
+                        aspect = logo_height / float(logo_width)
+                        logo_width = 2*cm  # Bigger logos
+                        logo_height = logo_width * aspect
+                        c.drawImage(logo_path, x + offset, y + cell_height - logo_height, width=logo_width, height=logo_height)
 
-        # Draw a border around the cell
-        c.rect(x, y, cell_width, cell_height)
+                # Add the name to the middle of the cell
+                c.setFont(f"{font}", 20)  # Bigger, bold font
+                c.drawCentredString(x + cell_width / 2, y + cell_height / 2, name)
+
+
+                # Add the user-specified word to the middle-bottom of the cell
+                if word_var == "Other" and custom_word:
+                    c.setFont("Helvetica", 14)  # Not bold
+                    c.drawCentredString(x + cell_width / 2, y + cell_height / 4, custom_word)
+                else:
+                    c.setFont("Helvetica", 14)  # Not bold
+                    c.drawCentredString(x + cell_width / 2, y + cell_height / 4, word_var)
+
+                # Draw a border around the cell
+                c.rect(x, y, cell_width, cell_height)
+
+        c.showPage()
 
     c.save()
 
@@ -82,7 +98,7 @@ def browse_files(entry):
 def switch_word_entry(value):
     if value == "Other":
         word_entry.config(state="normal")
-        word_optionmenu.config(state="disabled")
+        word_optionmenu.config(state="enabled")
     else:
         word_entry.config(state="disabled")
         word_optionmenu.config(state="normal")
@@ -132,7 +148,8 @@ logo2_entry.pack()
 logo2_button = tk.Button(root, text="Browse", command=lambda: browse_files(logo2_entry))
 logo2_button.pack()
 
-submit_button = tk.Button(root, text="Create Badges", command=lambda: create_pdf(names_entry.get().split(','), word_var.get(), font_var.get(), logo1_entry.get(), logo2_entry.get()))
+submit_button = tk.Button(root, text="Create Badges", command=lambda: create_pdf(names_entry.get().split(' '), word_var.get(), font_var.get(), logo1_entry.get(), logo2_entry.get(), word_entry.get() if word_var.get() == "Other" else None))
+
 submit_button.pack()
 
 root.mainloop()
