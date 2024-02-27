@@ -6,7 +6,7 @@ The Badges Generator is a Python application that allows users to create customi
 
 - Generate badges with custom names, statuses, and logos.
 - Choose from a variety of fonts for badge names.
-- Select different statuses such as "Candidate," "Faculty," or "Volunteer."
+- Select different statuses such as "Candidate," "Faculty," "Volunteer," or "Other."
 - Add logos to badges for enhanced customization.
 - Export badges in PDF format for printing or digital distribution.
 
