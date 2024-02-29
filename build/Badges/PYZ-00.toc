@@ -1,5 +1,5 @@
-('Z:\\Bahareez  Work\\Coding Related\\Badges '
- 'Generator\\build\\Badges\\PYZ-00.pyz',
+('C:\\Users\\Islam Elserougi\\OneDrive - Leeds Beckett '
+ 'University\\Projects\\Bin\\Badge-Generator-2\\build\\Badges\\PYZ-00.pyz',
  [('PIL',
    'C:\\Users\\Islam '
    'Elserougi\\AppData\\Local\\Programs\\Python\\Python310\\lib\\site-packages\\PIL\\__init__.py',

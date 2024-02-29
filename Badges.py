@@ -1,5 +1,5 @@
 import tkinter as tk
-import tkinter.font as tkFont
+#import tkinter.font as tkFont
 from tkinter import filedialog, ttk
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
@@ -27,9 +27,8 @@ font_files = [f for f in os.listdir(font_dir) if f.endswith('.ttf')]
 
 # Register each font with pdfmetrics
 for font_file in font_files:
-    font_name = os.path.splitext(font_file)[0]  
+    font_name = os.path.splitext(font_file)[0]
     pdfmetrics.registerFont(TTFont(font_name, os.path.join(font_dir, font_file)))
-
 
 # Function to create the PDF
 def create_pdf(names, word_var, font, logo_path1, logo_path2, custom_word=None):
@@ -98,6 +97,21 @@ def create_pdf(names, word_var, font, logo_path1, logo_path2, custom_word=None):
 
     c.save()
 
+    # Function to open the file dialog
+def browse_files(entry):
+    filename = filedialog.askopenfilename()
+    entry.delete(0, tk.END)
+    entry.insert(0, filename)
+
+# Function to switch between Entry and OptionMenu
+def switch_word_entry(*args):
+    if word_var.get() == "Other":
+        word_entry.config(state="normal")
+        word_optionmenu.config(state="enabled")
+    else:
+        word_entry.config(state="disabled")
+        word_optionmenu.config(state="normal")
+
 # Create the GUI
 root = tk.Tk()
 root.title("Badges Generator")
@@ -108,23 +122,6 @@ style.theme_use('clam')
 
 main_frame = ttk.Frame(root, padding="20")
 main_frame.grid(row=0, column=0, sticky="nsew")
-
-
-# Function to open the file dialog
-def browse_files(entry):
-    filename = filedialog.askopenfilename()
-    entry.delete(0, tk.END)
-    entry.insert(0, filename)
-
-# Function to switch between Entry and OptionMenu
-def switch_word_entry(*args):
-    if word_var.get() == "Other":
-        word_entry.config(state="normal")
-        #word_optionmenu.config(state="enabled")
-    else:
-        word_entry.config(state="disabled")
-        #word_optionmenu.config(state="normal")
-
 
 names_label = ttk.Label(main_frame, text="Enter names (separated by space):")
 names_label.grid(row=0, column=0, sticky="w", pady=5)
@@ -149,15 +146,13 @@ word_entry.grid(row=4, column=0, sticky="w", pady=5)
 font_label = ttk.Label(main_frame, text="Select a font for the names:")
 font_label.grid(row=5, column=0, sticky="w", pady=5)
 
-available_fonts = sorted(tkFont.families())
+#available_fonts = sorted(tkFont.families())
 
 font_var = tk.StringVar(root)
-font_var.set("Helvetica")  
+font_var.set("Choose")  
 
 font_names = [os.path.splitext(os.path.basename(font_file))[0] for font_file in font_files]
-font_optionmenu = ttk.OptionMenu(main_frame, font_var, *available_fonts)
-font_optionmenu.grid(row=6, column=0, sticky="w", pady=5)
-
+font_optionmenu = ttk.OptionMenu(main_frame, font_var, *font_names)
 font_optionmenu.grid(row=6, column=0, sticky="w", pady=5)
 
 
@@ -166,11 +161,11 @@ font_preview_label.grid(row=7, column=0, sticky="w", pady=5)
 
 def show_font_preview(*args):
     selected_font = font_var.get()
-    font = tkFont.Font(family=selected_font, size=12)
-    font_preview_label.config(font=font, text=f"Font preview")
+    #font = tk.get(family=font_names, size=12)
+    font_preview_label.config(font=(selected_font, 12), text="Font preview")
 
 font_var.trace_add("write", show_font_preview)
-show_font_preview()
+#show_font_preview()
 
 logo1_label = ttk.Label(main_frame, text="Select the logo on the Left:")
 logo1_label.grid(row=8, column=0, sticky="w", pady=5)
