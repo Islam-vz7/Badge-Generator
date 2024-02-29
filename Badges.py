@@ -98,21 +98,6 @@ def create_pdf(names, word_var, font, logo_path1, logo_path2, custom_word=None):
 
     c.save()
 
-# Function to open the file dialog
-def browse_files(entry):
-    filename = filedialog.askopenfilename()
-    entry.delete(0, tk.END)
-    entry.insert(0, filename)
-
-# Function to switch between Entry and OptionMenu
-def switch_word_entry(value):
-    if value == "Other":
-        word_entry.config(state="normal")
-        word_optionmenu.config(state="enabled")
-    else:
-        word_entry.config(state="disabled")
-        word_optionmenu.config(state="normal")
-
 # Create the GUI
 root = tk.Tk()
 root.title("Badges Generator")
@@ -124,13 +109,30 @@ style.theme_use('clam')
 main_frame = ttk.Frame(root, padding="20")
 main_frame.grid(row=0, column=0, sticky="nsew")
 
+
+# Function to open the file dialog
+def browse_files(entry):
+    filename = filedialog.askopenfilename()
+    entry.delete(0, tk.END)
+    entry.insert(0, filename)
+
+# Function to switch between Entry and OptionMenu
+def switch_word_entry(*args):
+    if word_var.get() == "Other":
+        word_entry.config(state="normal")
+        #word_optionmenu.config(state="enabled")
+    else:
+        word_entry.config(state="disabled")
+        #word_optionmenu.config(state="normal")
+
+
 names_label = ttk.Label(main_frame, text="Enter names (separated by space):")
 names_label.grid(row=0, column=0, sticky="w", pady=5)
 
 names_entry = ttk.Entry(main_frame, width=50)
 names_entry.grid(row=1, column=0, sticky="w", pady=5)
 
-options = ["Candidate", "Faculty", "Volunteer"]
+options = ["Choose", "Candidate", "Faculty", "Volunteer", "Other"]
 word_label = ttk.Label(main_frame, text="Select the status:")
 word_label.grid(row=2, column=0, sticky="w", pady=5)
 
@@ -138,7 +140,7 @@ word_var = tk.StringVar(root)
 word_var.set(options[0])  
 word_var.trace("w", lambda *args: switch_word_entry(word_var.get()))  
 
-word_optionmenu = ttk.OptionMenu(main_frame, word_var, *options, "Other")
+word_optionmenu = ttk.OptionMenu(main_frame, word_var, *options)
 word_optionmenu.grid(row=3, column=0, sticky="w", pady=5)
 
 word_entry = ttk.Entry(main_frame, width=20, state="disabled")
