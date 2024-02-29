@@ -1,4 +1,5 @@
 import tkinter as tk
+import tkinter.font as tkFont
 from tkinter import filedialog, ttk
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
@@ -26,13 +27,13 @@ font_files = [f for f in os.listdir(font_dir) if f.endswith('.ttf')]
 
 # Register each font with pdfmetrics
 for font_file in font_files:
-    font_name = os.path.splitext(font_file)[0]  # Remove the .ttf extension
+    font_name = os.path.splitext(font_file)[0]  
     pdfmetrics.registerFont(TTFont(font_name, os.path.join(font_dir, font_file)))
 
 
 # Function to create the PDF
 def create_pdf(names, word_var, font, logo_path1, logo_path2, custom_word=None):
-    # Ask the user to choose the file path and name for saving the PDF
+    
     file_path = filedialog.asksaveasfilename(defaultextension=".pdf", filetypes=[("PDF files", "*.pdf")])
     
     if not file_path:
@@ -41,11 +42,11 @@ def create_pdf(names, word_var, font, logo_path1, logo_path2, custom_word=None):
     c = canvas.Canvas(file_path, pagesize=A4)
     width, height = A4
     cell_width = width / 3
-    cell_height = height / 6  # Smaller, rectangular cells
+    cell_height = height / 6  
 
     num_names = len(names)
     max_names_per_page = 12
-    num_pages = (num_names - 1) // max_names_per_page + 1 # Calculate number of pages needed
+    num_pages = (num_names - 1) // max_names_per_page + 1 
 
     for page_num in range(num_pages):
 
@@ -58,10 +59,10 @@ def create_pdf(names, word_var, font, logo_path1, logo_path2, custom_word=None):
                 y = height - ((i // 3 % 4 + 1) * cell_height)
 
                 # Add the logos to the top corners of the cell
-                for logo_path, offset in zip([logo_path1, logo_path2], [0, cell_width - 2*cm]):  # Different logos
+                for logo_path, offset in zip([logo_path1, logo_path2], [0, cell_width - 2*cm]):  
                     if logo_path:
                         logo = Image.open(logo_path)
-                        logo = logo.convert("RGBA")  # Ensure RGBA mode for transparency
+                        logo = logo.convert("RGBA")  
                         logo_width, logo_height = logo.size
                         aspect = logo_height / float(logo_width)
                         
@@ -69,8 +70,8 @@ def create_pdf(names, word_var, font, logo_path1, logo_path2, custom_word=None):
                         logo_width *= 1.5
                         logo_height *= 1.5
                         
-                        logo_width = min(logo_width, 2*cm)  # Limit the maximum width
-                        logo_height = min(logo_height, 2*cm)  # Limit the maximum height
+                        logo_width = min(logo_width, 2*cm)  
+                        logo_height = min(logo_height, 2*cm)  
 
                         # Draw the image onto the canvas
                         c.saveState()
@@ -116,7 +117,7 @@ def switch_word_entry(value):
 root = tk.Tk()
 root.title("Badges Generator")
 
-# Set the theme to 'clam'
+
 style = ttk.Style()
 style.theme_use('clam')
 
@@ -134,8 +135,8 @@ word_label = ttk.Label(main_frame, text="Select the status:")
 word_label.grid(row=2, column=0, sticky="w", pady=5)
 
 word_var = tk.StringVar(root)
-word_var.set(options[0])  # default value
-word_var.trace("w", lambda *args: switch_word_entry(word_var.get()))  # call switch_word_entry when the variable changes
+word_var.set(options[0])  
+word_var.trace("w", lambda *args: switch_word_entry(word_var.get()))  
 
 word_optionmenu = ttk.OptionMenu(main_frame, word_var, *options, "Other")
 word_optionmenu.grid(row=3, column=0, sticky="w", pady=5)
@@ -146,33 +147,49 @@ word_entry.grid(row=4, column=0, sticky="w", pady=5)
 font_label = ttk.Label(main_frame, text="Select a font for the names:")
 font_label.grid(row=5, column=0, sticky="w", pady=5)
 
+available_fonts = sorted(tkFont.families())
+
 font_var = tk.StringVar(root)
-font_var.set("Helvetica")  # default value
+font_var.set("Helvetica")  
 
 font_names = [os.path.splitext(os.path.basename(font_file))[0] for font_file in font_files]
-font_optionmenu = ttk.OptionMenu(main_frame, font_var, *font_names)
+font_optionmenu = ttk.OptionMenu(main_frame, font_var, *available_fonts)
 font_optionmenu.grid(row=6, column=0, sticky="w", pady=5)
 
+font_optionmenu.grid(row=6, column=0, sticky="w", pady=5)
+
+
+font_preview_label = ttk.Label(main_frame, text="Font Preview")
+font_preview_label.grid(row=7, column=0, sticky="w", pady=5)
+
+def show_font_preview(*args):
+    selected_font = font_var.get()
+    font = tkFont.Font(family=selected_font, size=12)
+    font_preview_label.config(font=font, text=f"Font preview")
+
+font_var.trace_add("write", show_font_preview)
+show_font_preview()
+
 logo1_label = ttk.Label(main_frame, text="Select the logo on the Left:")
-logo1_label.grid(row=7, column=0, sticky="w", pady=5)
+logo1_label.grid(row=8, column=0, sticky="w", pady=5)
 
 logo1_entry = ttk.Entry(main_frame, width=50)
-logo1_entry.grid(row=8, column=0, sticky="w", pady=5)
+logo1_entry.grid(row=9, column=0, sticky="w", pady=5)
 
 logo1_button = ttk.Button(main_frame, text="Browse", command=lambda: browse_files(logo1_entry))
-logo1_button.grid(row=8, column=1, sticky="w", pady=5)
+logo1_button.grid(row=9, column=1, sticky="w", pady=5)
 
 logo2_label = ttk.Label(main_frame, text="Select the logo on the Right:")
-logo2_label.grid(row=9, column=0, sticky="w", pady=5)
+logo2_label.grid(row=10, column=0, sticky="w", pady=5)
 
 logo2_entry = ttk.Entry(main_frame, width=50)
-logo2_entry.grid(row=10, column=0, sticky="w", pady=5)
+logo2_entry.grid(row=11, column=0, sticky="w", pady=5)
 
 logo2_button = ttk.Button(main_frame, text="Browse", command=lambda: browse_files(logo2_entry))
-logo2_button.grid(row=10, column=1, sticky="w", pady=5)
+logo2_button.grid(row=11, column=1, sticky="w", pady=5)
 
 submit_button = ttk.Button(main_frame, text="Create Badges", command=lambda: create_pdf(names_entry.get().split(' '), word_var.get(), font_var.get(), logo1_entry.get(), logo2_entry.get(), word_entry.get() if word_var.get() == "Other" else None))
-submit_button.grid(row=11, column=0, sticky="w", pady=10)
+submit_button.grid(row=12, column=0, sticky="w", pady=10)
 
 
 # Set styles for the main frame
